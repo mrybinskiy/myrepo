@@ -18,16 +18,16 @@ using Poco::Util::HelpFormatter;
 class NetInvertApp: public ServerApplication
 {
 private:
-	const UInt16 DEFAULT_PORT = 28888;
-	const int INPUT_MAX = 255;
-	const std::string s_helloStr = 
-		"Welcome to the POCO TCP Server.\nEnter your string:\n";
-	
+    const UInt16 DEFAULT_PORT = 28888;
+    const int INPUT_MAX = 255;
+    const std::string s_helloStr = 
+        "Welcome to the POCO TCP Server.\nEnter your string:\n";
+    
 private:
     bool m_helpRequested = false;
     UInt16 m_port = DEFAULT_PORT; 
-    		
-public:	
+            
+public: 
     void initialize(Application& self)
     {
         loadConfiguration();
@@ -38,17 +38,17 @@ public:
     {
         ServerApplication::defineOptions(options);
         options.addOption(
-		    Option("port", "p", "Set port number", false, "<port>", true)
-				.required(false)
-				.repeatable(false)
-				.callback(OptionCallback<NetInvertApp>(
-					this, &NetInvertApp::handlePort))); 
+            Option("port", "p", "Set port number", false, "<port>", true)
+                .required(false)
+                .repeatable(false)
+                .callback(OptionCallback<NetInvertApp>(
+                    this, &NetInvertApp::handlePort))); 
         options.addOption(
-		    Option("help", "h", "Display this help")
-				.required(false)
-				.repeatable(false)
-				.callback(OptionCallback<NetInvertApp>(
-					this, &NetInvertApp::handleHelp)));
+            Option("help", "h", "Display this help")
+                .required(false)
+                .repeatable(false)
+                .callback(OptionCallback<NetInvertApp>(
+                    this, &NetInvertApp::handleHelp)));
     }
 
     void handleHelp(const std::string& name, const std::string& value)
@@ -75,38 +75,38 @@ public:
     int main(const std::vector<std::string>&)
     {
         if (!m_helpRequested)
-        {		
-			logger().information("Starting POCO TCP server on port %hu", m_port);
-			ServerSocket srv(m_port);
-			while (true)
-			{
-				StreamSocket ss = srv.acceptConnection();
+        {       
+            logger().information("Starting POCO TCP server on port %hu", m_port);
+            ServerSocket srv(m_port);
+            while (true)
+            {
+                StreamSocket ss = srv.acceptConnection();
                 logger().information("Client connected from %s",
                                      ss.address().host().toString());
-				ss.sendBytes(s_helloStr.data(), s_helloStr.size());
-				char buf [INPUT_MAX];				
-				while (true)
-				{
-					int n = ss.receiveBytes(buf, INPUT_MAX);
-					if (n == 0) // Graceful shutdown from the peer
-					{
+                ss.sendBytes(s_helloStr.data(), s_helloStr.size());
+                char buf [INPUT_MAX];               
+                while (true)
+                {
+                    int n = ss.receiveBytes(buf, INPUT_MAX);
+                    if (n == 0) // Graceful shutdown from the peer
+                    {
                         logger().information("Connection closed by peer");
                         ss.shutdown();
-						break;
-					}
-					std::string str(buf, n);
-					std::cout << str;						
-					auto strEnd = str.end();
-					if (str[n - 1] == '\n')
-					{
-						// keep the last newline from reversing
-						strEnd--;
-					}				
-					std::reverse(str.begin(), strEnd);
-					ss.sendBytes(str.data(), str.size());
-				}
-			}
-		}
+                        break;
+                    }
+                    std::string str(buf, n);
+                    std::cout << str;                       
+                    auto strEnd = str.end();
+                    if (str[n - 1] == '\n')
+                    {
+                        // keep the last newline from reversing
+                        strEnd--;
+                    }               
+                    std::reverse(str.begin(), strEnd);
+                    ss.sendBytes(str.data(), str.size());
+                }
+            }
+        }
         return Application::EXIT_OK;
     }      
 
